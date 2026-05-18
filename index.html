@@ -760,7 +760,7 @@ function submitAnswer() {
     selectedOption = null;
     scores[q.category] = (scores[q.category] || 0) + earned;
     currentQ++;
-    setTimeout(renderQuestion, 900);
+    setTimeout(currentQ >= questions.length ? showResults : renderQuestion, 900);
     return;
 
   } else if (q.type === 'text') {
