@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Test de Memoria y Atención</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Georgia', serif;
+      background: #f5f0e8;
+      color: #2c2c2c;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    #app {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 30px rgba(0,0,0,0.12);
+      max-width: 720px;
+      width: 100%;
+      padding: 48px 52px;
+    }
+
+    h1 {
+      font-size: 2rem;
+      color: #1a3a5c;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 1.05rem;
+      color: #666;
+      margin-bottom: 36px;
+    }
+
+    .section-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #888;
+      margin-bottom: 10px;
+    }
+
+    .question-text {
+      font-size: 1.4rem;
+      line-height: 1.6;
+      color: #1a1a1a;
+      margin-bottom: 28px;
+    }
+
+    .instruction {
+      font-size: 1rem;
+      color: #555;
+      background: #f0f4f8;
+      border-left: 4px solid #1a3a5c;
+      padding: 14px 18px;
+      border-radius: 6px;
+      margin-bottom: 28px;
+      line-height: 1.6;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .option-btn {
+      background: #f5f0e8;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      padding: 16px 22px;
+      font-size: 1.2rem;
+      font-family: inherit;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s;
+      color: #1a1a1a;
+    }
+
+    .option-btn:hover { border-color: #1a3a5c; background: #e8f0fa; }
+    .option-btn.selected { border-color: #1a3a5c; background: #1a3a5c; color: white; }
+    .option-btn.correct { border-color: #2e7d32; background: #e8f5e9; color: #1b5e20; }
+    .option-btn.wrong { border-color: #c62828; background: #ffebee; color: #b71c1c; }
+
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      font-size: 1.3rem;
+      font-family: inherit;
+      padding: 14px 18px;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      margin-bottom: 24px;
+      outline: none;
+      transition: border 0.2s;
+    }
+
+    input:focus { border-color: #1a3a5c; }
+
+    .btn {
+      background: #1a3a5c;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 16px 36px;
+      font-size: 1.15rem;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn:hover { background: #14304f; }
+    .btn:disabled { background: #aaa; cursor: not-allowed; }
+
+    .btn-secondary {
+      background: transparent;
+      border: 2px solid #1a3a5c;
+      color: #1a3a5c;
+      margin-left: 12px;
+    }
+    .btn-secondary:hover { background: #e8f0fa; }
+
+    .progress-bar-wrap {
+      background: #e0e0e0;
+      border-radius: 99px;
+      height: 6px;
+      margin-bottom: 36px;
+    }
+
+    .progress-bar {
+      background: #1a3a5c;
+      height: 6px;
+      border-radius: 99px;
+      transition: width 0.4s;
+    }
+
+    .memory-words {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      justify-content: center;
+      margin: 24px 0 32px;
+    }
+
+    .memory-word {
+      background: #1a3a5c;
+      color: white;
+      font-size: 1.5rem;
+      padding: 16px 28px;
+      border-radius: 10px;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    .timer-bar-wrap {
+      background: #e0e0e0;
+      border-radius: 99px;
+      height: 8px;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+
+    .timer-bar {
+      background: #e65100;
+      height: 8px;
+      border-radius: 99px;
+      transition: width 1s linear;
+    }
+
+    .timer-text {
+      font-size: 0.95rem;
+      color: #888;
+      margin-bottom: 20px;
+    }
+
+    #results {
+      text-align: center;
+    }
+
+    .score-circle {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 24px auto;
+      border: 8px solid;
+    }
+
+    .score-number {
+      font-size: 3rem;
+      font-weight: bold;
+      line-height: 1;
+    }
+
+    .score-max {
+      font-size: 1rem;
+      color: #888;
+    }
+
+    .result-label {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin: 8px 0;
+    }
+
+    .result-desc {
+      font-size: 1.05rem;
+      color: #555;
+      max-width: 500px;
+      margin: 0 auto 28px;
+      line-height: 1.6;
+    }
+
+    .breakdown {
+      text-align: left;
+      border-top: 1px solid #eee;
+      margin-top: 24px;
+      padding-top: 24px;
+    }
+
+    .breakdown h3 {
+      font-size: 1.1rem;
+      color: #555;
+      margin-bottom: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 0.85rem;
+    }
+
+    .breakdown-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 1.05rem;
+    }
+
+    .breakdown-score {
+      font-weight: bold;
+      color: #1a3a5c;
+    }
+
+    .hidden { display: none; }
+
+    .word-inputs {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .word-inputs input {
+      margin-bottom: 0;
+    }
+
+    @media (max-width: 600px) {
+      #app { padding: 28px 22px; }
+      h1 { font-size: 1.5rem; }
+      .question-text { font-size: 1.15rem; }
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- INTRO -->
+  <div id="screen-intro">
+    <h1>Test de Memoria y Atención</h1>
+    <p class="subtitle">Una evaluación rápida y amigable — tómate tu tiempo</p>
+    <p class="instruction">
+      Este test tiene <strong>8 secciones cortas</strong> que evalúan memoria, atención, orientación y razonamiento.<br><br>
+      No hay respuestas buenas o malas — solo sé honesto y tranquilo. Dura aproximadamente <strong>10 minutos</strong>.
+    </p>
+    <button class="btn" onclick="startTest()">Comenzar el Test</button>
+  </div>
+
+  <!-- QUESTION SCREEN -->
+  <div id="screen-question" class="hidden">
+    <div class="progress-bar-wrap">
+      <div class="progress-bar" id="progress-bar" style="width:0%"></div>
+    </div>
+    <div class="section-label" id="section-label"></div>
+    <div class="question-text" id="question-text"></div>
+    <div class="instruction hidden" id="instruction-text"></div>
+
+    <!-- Timer (shown for timed questions) -->
+    <div id="timer-wrap" class="hidden">
+      <div class="timer-bar-wrap"><div class="timer-bar" id="timer-bar" style="width:100%"></div></div>
+      <div class="timer-text" id="timer-text"></div>
+    </div>
+
+    <!-- Memory words display -->
+    <div id="memory-words-display" class="hidden">
+      <div class="memory-words" id="memory-words"></div>
+    </div>
+
+    <!-- Multiple choice -->
+    <div id="options-wrap" class="options hidden"></div>
+
+    <!-- Text input -->
+    <div id="input-wrap" class="hidden">
+      <input type="text" id="text-input" placeholder="Tu respuesta..." autocomplete="off" />
+    </div>
+
+    <!-- Number input -->
+    <div id="number-input-wrap" class="hidden">
+      <input type="number" id="number-input" placeholder="Escribe el número..." />
+    </div>
+
+    <!-- Multiple word inputs for memory recall -->
+    <div id="word-recall-wrap" class="hidden">
+      <div class="word-inputs" id="word-inputs-container"></div>
+    </div>
+
+    <div id="btn-row">
+      <button class="btn" id="next-btn" onclick="submitAnswer()">Siguiente</button>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="screen-results" class="hidden" id="results">
+    <h1>Resultado del Test</h1>
+    <div class="score-circle" id="score-circle">
+      <div class="score-number" id="score-number"></div>
+      <div class="score-max" id="score-max"></div>
+    </div>
+    <div class="result-label" id="result-label"></div>
+    <div class="result-desc" id="result-desc"></div>
+    <div class="breakdown">
+      <h3>Detalle por área</h3>
+      <div id="breakdown-rows"></div>
+    </div>
+    <br>
+    <button class="btn" onclick="location.reload()">Repetir el Test</button>
+  </div>
+
+</div>
+
+<script>
+// ─── State ────────────────────────────────────────────────────────────────────
+let currentQ = 0;
+let scores = {};           // category → points earned
+let maxScores = {};        // category → max points
+let timerInterval = null;
+let memoryWords = [];
+
+// ─── Questions ────────────────────────────────────────────────────────────────
+// type: 'info' | 'mcq' | 'text' | 'number' | 'word-recall' | 'memory-display'
+const MEMORY_WORDS = ['ÁRBOL', 'CASA', 'PELOTA'];
+
+const questions = [
+
+  // ── 1. Orientation (8 pts) ─────────────────────────────────────────────────
+  {
+    id: 'orient_day',
+    section: 'Orientación temporal',
+    q: '¿Qué día de la semana es hoy?',
+    type: 'mcq',
+    options: ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'],
+    correct: () => ['lunes','martes','miércoles','jueves','viernes','sábado','domingo'][new Date().getDay() === 0 ? 6 : new Date().getDay() - 1],
+    points: 1,
+    category: 'Orientación',
+  },
+  {
+    id: 'orient_date',
+    section: 'Orientación temporal',
+    q: '¿Cuál es la fecha de hoy? (número del día)',
+    type: 'number',
+    correct: () => String(new Date().getDate()),
+    points: 1,
+    category: 'Orientación',
+  },
+  {
+    id: 'orient_month',
+    section: 'Orientación temporal',
+    q: '¿En qué mes estamos?',
+    type: 'mcq',
+    options: ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'],
+    correct: () => ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'][new Date().getMonth()],
+    points: 1,
+    category: 'Orientación',
+  },
+  {
+    id: 'orient_year',
+    section: 'Orientación temporal',
+    q: '¿En qué año estamos?',
+    type: 'number',
+    correct: () => String(new Date().getFullYear()),
+    points: 1,
+    category: 'Orientación',
+  },
+  {
+    id: 'orient_season',
+    section: 'Orientación temporal',
+    q: '¿En qué estación del año estamos?',
+    type: 'mcq',
+    options: ['Primavera','Verano','Otoño','Invierno'],
+    // Southern hemisphere seasons
+    correct: () => {
+      const m = new Date().getMonth() + 1;
+      if ([12,1,2].includes(m)) return 'verano';
+      if ([3,4,5].includes(m)) return 'otoño';
+      if ([6,7,8].includes(m)) return 'invierno';
+      return 'primavera';
+    },
+    points: 1,
+    category: 'Orientación',
+  },
+  {
+    id: 'orient_place',
+    section: 'Orientación espacial',
+    q: '¿En qué país estamos?',
+    type: 'text',
+    correct: () => null, // manual scoring via keyword
+    keywords: ['argentina','argentin'],
+    points: 1,
+    category: 'Orientación',
+  },
+  {
+    id: 'orient_city',
+    section: 'Orientación espacial',
+    q: '¿En qué ciudad estás ahora mismo?',
+    type: 'text',
+    correct: () => null,
+    keywords: null, // any answer gets the point — just must answer something meaningful
+    freeText: true,
+    points: 1,
+    category: 'Orientación',
+  },
+  {
+    id: 'orient_floor',
+    section: 'Orientación espacial',
+    q: '¿En qué piso o planta de edificio estás en este momento?',
+    type: 'text',
+    freeText: true,
+    points: 1,
+    category: 'Orientación',
+  },
+
+  // ── 2. Memory registration (show words) ────────────────────────────────────
+  {
+    id: 'memory_show',
+    section: 'Memoria a corto plazo',
+    q: 'Voy a mostrarte 3 palabras. Tómate unos segundos para recordarlas — te las voy a pedir después.',
+    type: 'memory-display',
+    timedSeconds: 10,
+    category: 'Memoria',
+    points: 0,
+  },
+
+  // ── 3. Attention & Calculation (5 pts) ─────────────────────────────────────
+  {
+    id: 'calc1',
+    section: 'Atención y cálculo',
+    q: '¿Cuánto es 100 menos 7?',
+    type: 'number',
+    correct: () => '93',
+    points: 1,
+    category: 'Cálculo',
+  },
+  {
+    id: 'calc2',
+    section: 'Atención y cálculo',
+    q: 'Ahora réstale 7 al resultado anterior (93 − 7 = ?)',
+    type: 'number',
+    correct: () => '86',
+    points: 1,
+    category: 'Cálculo',
+  },
+  {
+    id: 'calc3',
+    section: 'Atención y cálculo',
+    q: 'Una vez más: 86 − 7 = ?',
+    type: 'number',
+    correct: () => '79',
+    points: 1,
+    category: 'Cálculo',
+  },
+  {
+    id: 'calc4',
+    section: 'Atención y cálculo',
+    q: '¿Cuántos meses tiene un año?',
+    type: 'number',
+    correct: () => '12',
+    points: 1,
+    category: 'Cálculo',
+  },
+  {
+    id: 'calc5',
+    section: 'Atención y cálculo',
+    q: 'Si tienes 3 manzanas y te dan 4 más, ¿cuántas tienes en total?',
+    type: 'number',
+    correct: () => '7',
+    points: 1,
+    category: 'Cálculo',
+  },
+
+  // ── 4. Language (4 pts) ────────────────────────────────────────────────────
+  {
+    id: 'lang1',
+    section: 'Lenguaje',
+    q: 'Completa el refrán: "No hay mal que por bien…"',
+    type: 'mcq',
+    options: ['…no venga','…no llegue','…no sirva','…no exista'],
+    correct: () => '…no venga',
+    points: 1,
+    category: 'Lenguaje',
+  },
+  {
+    id: 'lang2',
+    section: 'Lenguaje',
+    q: 'Completa la frase: "Más vale tarde…"',
+    type: 'mcq',
+    options: ['…que nunca','…que siempre','…que temprano','…que tarde'],
+    correct: () => '…que nunca',
+    points: 1,
+    category: 'Lenguaje',
+  },
+  {
+    id: 'lang3',
+    section: 'Lenguaje',
+    q: '¿Cuál de estas palabras NO es un animal?',
+    type: 'mcq',
+    options: ['Caballo','Delfín','Cedro','Tigre'],
+    correct: () => 'Cedro',
+    points: 1,
+    category: 'Lenguaje',
+  },
+  {
+    id: 'lang4',
+    section: 'Lenguaje',
+    q: 'Nombrá 3 frutas. Escribe las 3 separadas por coma.',
+    type: 'text',
+    keywords: ['manzana','pera','naranja','banana','uva','durazno','frutilla','melón','sandía','limón','kiwi','mango','ciruela','cereza','higo','pomelo','mandarina','frambuesa','arándano'],
+    keywordCount: 3,
+    points: 1,
+    category: 'Lenguaje',
+  },
+
+  // ── 5. Memory recall (3 pts) ───────────────────────────────────────────────
+  {
+    id: 'memory_recall',
+    section: 'Memoria a corto plazo',
+    q: '¿Recuerdas las 3 palabras que te mostré antes? Escribe una por casilla.',
+    type: 'word-recall',
+    words: MEMORY_WORDS,
+    points: 3, // 1 per word
+    category: 'Memoria',
+  },
+
+  // ── 6. Reasoning / Abstraction (2 pts) ────────────────────────────────────
+  {
+    id: 'reason1',
+    section: 'Razonamiento',
+    q: '¿En qué se parecen un reloj y una regla?',
+    type: 'mcq',
+    options: ['Ambos miden algo','Ambos son redondos','Ambos se rompen','Ambos son de metal'],
+    correct: () => 'Ambos miden algo',
+    points: 1,
+    category: 'Razonamiento',
+  },
+  {
+    id: 'reason2',
+    section: 'Razonamiento',
+    q: 'Continuá la secuencia: 2 — 4 — 6 — 8 — ?',
+    type: 'number',
+    correct: () => '10',
+    points: 1,
+    category: 'Razonamiento',
+  },
+
+  // ── 7. Attention / Concentration (2 pts) ──────────────────────────────────
+  {
+    id: 'attn1',
+    section: 'Atención',
+    q: 'Lee esta lista y contá cuántas veces aparece la letra A:\n\n"B A T A L L A A R G E N T I N A"',
+    type: 'number',
+    correct: () => '5',
+    instruction: 'Cuenta con calma — hay exactamente 5 letras A.',
+    points: 1,
+    category: 'Atención',
+  },
+  {
+    id: 'attn2',
+    section: 'Atención',
+    q: 'Escribe la palabra MUNDO al revés.',
+    type: 'text',
+    correct: () => 'odnum',
+    points: 1,
+    category: 'Atención',
+  },
+
+  // ── 8. Remote memory / General knowledge (2 pts) ──────────────────────────
+  {
+    id: 'remote1',
+    section: 'Memoria a largo plazo',
+    q: '¿Quién fue el primer presidente de Argentina?',
+    type: 'mcq',
+    options: ['Bernardino Rivadavia','José de San Martín','Bartolomé Mitre','Julio Roca'],
+    correct: () => 'Bernardino Rivadavia',
+    points: 1,
+    category: 'Memoria remota',
+  },
+  {
+    id: 'remote2',
+    section: 'Memoria a largo plazo',
+    q: '¿En qué año comenzó la Primera Guerra Mundial?',
+    type: 'mcq',
+    options: ['1904','1914','1918','1939'],
+    correct: () => '1914',
+    points: 1,
+    category: 'Memoria remota',
+  },
+];
+
+// ─── Setup max scores ─────────────────────────────────────────────────────────
+questions.forEach(q => {
+  if (!maxScores[q.category]) maxScores[q.category] = 0;
+  maxScores[q.category] += q.points;
+  if (!scores[q.category]) scores[q.category] = 0;
+});
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+function show(id) { document.getElementById(id).classList.remove('hidden'); }
+function hide(id) { document.getElementById(id).classList.add('hidden'); }
+
+function normalize(s) {
+  return s.toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .trim();
+}
+
+// ─── Start ────────────────────────────────────────────────────────────────────
+function startTest() {
+  hide('screen-intro');
+  show('screen-question');
+  renderQuestion();
+}
+
+// ─── Render ───────────────────────────────────────────────────────────────────
+function renderQuestion() {
+  clearTimer();
+  const q = questions[currentQ];
+  const pct = Math.round((currentQ / questions.length) * 100);
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('section-label').textContent = q.section;
+  document.getElementById('question-text').textContent = q.q;
+
+  // Hide everything
+  ['options-wrap','input-wrap','number-input-wrap','word-recall-wrap','memory-words-display','timer-wrap','instruction-text'].forEach(hide);
+  document.getElementById('next-btn').disabled = false;
+  document.getElementById('options-wrap').innerHTML = '';
+
+  if (q.instruction) {
+    document.getElementById('instruction-text').textContent = q.instruction;
+    show('instruction-text');
+  }
+
+  if (q.type === 'memory-display') {
+    const container = document.getElementById('memory-words');
+    container.innerHTML = '';
+    MEMORY_WORDS.forEach(w => {
+      const el = document.createElement('div');
+      el.className = 'memory-word';
+      el.textContent = w;
+      container.appendChild(el);
+    });
+    show('memory-words-display');
+    document.getElementById('next-btn').disabled = true;
+    startTimer(q.timedSeconds, () => {
+      document.getElementById('next-btn').disabled = false;
+    });
+    return;
+  }
+
+  if (q.type === 'mcq') {
+    const wrap = document.getElementById('options-wrap');
+    q.options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.textContent = opt;
+      btn.onclick = () => selectOption(btn, opt);
+      wrap.appendChild(btn);
+    });
+    show('options-wrap');
+    document.getElementById('next-btn').disabled = true;
+    return;
+  }
+
+  if (q.type === 'text') {
+    document.getElementById('text-input').value = '';
+    show('input-wrap');
+    document.getElementById('text-input').focus();
+    return;
+  }
+
+  if (q.type === 'number') {
+    document.getElementById('number-input').value = '';
+    show('number-input-wrap');
+    document.getElementById('number-input').focus();
+    return;
+  }
+
+  if (q.type === 'word-recall') {
+    const container = document.getElementById('word-inputs-container');
+    container.innerHTML = '';
+    for (let i = 0; i < 3; i++) {
+      const inp = document.createElement('input');
+      inp.type = 'text';
+      inp.placeholder = `Palabra ${i + 1}...`;
+      inp.id = `recall-word-${i}`;
+      inp.autocomplete = 'off';
+      container.appendChild(inp);
+    }
+    show('word-recall-wrap');
+    document.getElementById('recall-word-0').focus();
+    return;
+  }
+}
+
+let selectedOption = null;
+
+function selectOption(btn, value) {
+  document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedOption = value;
+  document.getElementById('next-btn').disabled = false;
+}
+
+// ─── Submit ───────────────────────────────────────────────────────────────────
+function submitAnswer() {
+  const q = questions[currentQ];
+  let earned = 0;
+
+  if (q.type === 'memory-display') {
+    // No scoring, just move on
+  } else if (q.type === 'mcq') {
+    const correct = normalize(q.correct());
+    if (normalize(selectedOption || '') === correct) {
+      earned = q.points;
+      document.querySelector('.option-btn.selected').classList.add('correct');
+    } else {
+      document.querySelector('.option-btn.selected')?.classList.add('wrong');
+      // Show correct
+      document.querySelectorAll('.option-btn').forEach(b => {
+        if (normalize(b.textContent) === correct) b.classList.add('correct');
+      });
+    }
+    selectedOption = null;
+    scores[q.category] = (scores[q.category] || 0) + earned;
+    currentQ++;
+    setTimeout(renderQuestion, 900);
+    return;
+
+  } else if (q.type === 'text') {
+    const raw = normalize(document.getElementById('text-input').value);
+    if (q.freeText && raw.length > 1) {
+      earned = q.points; // any non-empty answer
+    } else if (q.keywords && q.keywordCount) {
+      const hits = q.keywords.filter(k => raw.includes(normalize(k)));
+      earned = hits.length >= q.keywordCount ? q.points : 0;
+    } else if (q.keywords) {
+      earned = q.keywords.some(k => raw.includes(normalize(k))) ? q.points : 0;
+    } else if (q.correct) {
+      const c = q.correct();
+      earned = c && normalize(raw) === normalize(c) ? q.points : 0;
+    } else {
+      earned = raw.length > 0 ? q.points : 0;
+    }
+
+  } else if (q.type === 'number') {
+    const val = document.getElementById('number-input').value.trim();
+    earned = normalize(val) === normalize(q.correct()) ? q.points : 0;
+
+  } else if (q.type === 'word-recall') {
+    for (let i = 0; i < 3; i++) {
+      const val = normalize(document.getElementById(`recall-word-${i}`).value || '');
+      if (val === normalize(MEMORY_WORDS[i])) earned++;
+    }
+  }
+
+  scores[q.category] = (scores[q.category] || 0) + earned;
+  currentQ++;
+  if (currentQ >= questions.length) {
+    showResults();
+  } else {
+    renderQuestion();
+  }
+}
+
+// ─── Timer ────────────────────────────────────────────────────────────────────
+function startTimer(seconds, onDone) {
+  show('timer-wrap');
+  let remaining = seconds;
+  const bar = document.getElementById('timer-bar');
+  const text = document.getElementById('timer-text');
+  bar.style.width = '100%';
+  text.textContent = `Tómate ${remaining} segundos para memorizarlas…`;
+  timerInterval = setInterval(() => {
+    remaining--;
+    bar.style.width = (remaining / seconds * 100) + '%';
+    text.textContent = remaining > 0
+      ? `Quedan ${remaining} segundos…`
+      : '¡Listo! Podés continuar.';
+    if (remaining <= 0) {
+      clearInterval(timerInterval);
+      if (onDone) onDone();
+    }
+  }, 1000);
+}
+
+function clearTimer() {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+}
+
+// ─── Results ──────────────────────────────────────────────────────────────────
+function showResults() {
+  hide('screen-question');
+  show('screen-results');
+
+  const total = Object.values(scores).reduce((a, b) => a + b, 0);
+  const max = Object.values(maxScores).reduce((a, b) => a + b, 0);
+  const pct = total / max;
+
+  document.getElementById('score-number').textContent = total;
+  document.getElementById('score-max').textContent = '/ ' + max + ' puntos';
+
+  let color, label, desc;
+  if (pct >= 0.85) {
+    color = '#2e7d32'; label = 'Excelente';
+    desc = 'El desempeño es muy bueno. La memoria, orientación y razonamiento se muestran en plena forma. ¡Felicitaciones!';
+  } else if (pct >= 0.70) {
+    color = '#1565c0'; label = 'Muy Bueno';
+    desc = 'Buen desempeño general. Algunas áreas pueden tener leves variaciones, lo cual es normal.';
+  } else if (pct >= 0.55) {
+    color = '#e65100'; label = 'Dentro de lo normal';
+    desc = 'Desempeño aceptable. Sería útil repetir el test en otra ocasión y consultar con un médico si hay dudas.';
+  } else {
+    color = '#b71c1c'; label = 'Requiere atención';
+    desc = 'Algunas áreas presentan dificultades. Se recomienda consultar con un profesional de la salud para una evaluación más completa.';
+  }
+
+  const circle = document.getElementById('score-circle');
+  circle.style.borderColor = color;
+  circle.style.color = color;
+  document.getElementById('result-label').textContent = label;
+  document.getElementById('result-label').style.color = color;
+  document.getElementById('result-desc').textContent = desc;
+
+  // Breakdown
+  const rows = document.getElementById('breakdown-rows');
+  rows.innerHTML = '';
+  Object.keys(maxScores).forEach(cat => {
+    const row = document.createElement('div');
+    row.className = 'breakdown-row';
+    const s = scores[cat] || 0;
+    const m = maxScores[cat];
+    row.innerHTML = `<span>${cat}</span><span class="breakdown-score">${s} / ${m}</span>`;
+    rows.appendChild(row);
+  });
+}
+
+// ─── Keyboard support ─────────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const btn = document.getElementById('next-btn');
+    if (btn && !btn.disabled) btn.click();
+  }
+});
+</script>
+</body>
+</html>
